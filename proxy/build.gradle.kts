@@ -5,19 +5,20 @@
  */
 
 plugins {
-    application
     java
+    application
     kotlin("jvm")
+    kotlin("plugin.serialization") version kotlinVersion
+    id("org.openjfx.javafxplugin") version "0.0.9"
+    id("org.beryx.jlink") version "2.21.0"
 }
 
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
+    mavenCentral()
     jcenter()
 }
 
 dependencies {
-
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
@@ -26,6 +27,26 @@ dependencies {
 }
 
 application {
-    // Define the main class for the application.
+    mainModule.set("com.abysl.chaos.proxy")
     mainClassName = "com.abysl.chaos.proxy.AppKt"
+}
+
+javafx {
+    version = "14"
+    modules = listOf("javafx.controls", "javafx.web", "javafx.fxml")
+}
+
+jlink {
+    options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
+
+    launcher {
+        name = "Chaos Proxy"
+    }
+
+    jpackage {
+        resourceDir = file("$buildDir/resources")
+        imageOptions = listOf("--icon", "src/main/resources/com/abysl/chaos/proxy/images/chaos.ico")
+        installerOptions = listOf("--win-per-user-install", "--win-dir-chooser", "--win-menu")
+        appVersion = project.version.toString()
+    }
 }

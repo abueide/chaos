@@ -4,6 +4,7 @@ plugins {
 
 repositories{
 	mavenCentral()
+    jcenter()
 }
 
 allprojects{
@@ -11,11 +12,6 @@ allprojects{
     group = "com.abysl.chaos"
 }
 subprojects {
-	tasks.register("hello") {
-		doLast {
-			println("I'm ${this.project.name}")
-		}
-	}
 }
 
 configure(subprojects.filter {it.name == "manager" || it.name == "proxy"}) {

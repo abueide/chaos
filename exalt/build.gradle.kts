@@ -18,6 +18,5 @@ plugins {
 // Set the target operating system and architecture for this library
 library {
     targetMachines.add(machines.windows.x86_64)
-    linkage.set(listOf(Linkage.SHARED))
 }
 
