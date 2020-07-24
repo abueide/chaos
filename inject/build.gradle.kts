@@ -14,7 +14,20 @@ plugins {
     `cpp-unit-test`
 }
 
+
 // Set the target operating system and architecture for this application
 application {
     targetMachines.add(machines.windows.x86_64)
 }
+
+task<Exec>("run"){
+//    dependsOn(tasks.named("installDebug"))
+    commandLine("$buildDir/exe/main/debug/${project.name}.exe")
+}
+
+val createRelease by tasks.registering {
+    dependsOn("installRelease")
+    val exe = file("$buildDir/exe/main/release/${project.name}.exe")
+    outputs.file(exe)
+}
+

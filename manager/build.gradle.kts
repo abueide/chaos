@@ -5,34 +5,93 @@
  */
 
 plugins {
-    // Apply the Kotlin JVM plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm") version "1.3.72"
-
-    // Apply the application plugin to add support for building a CLI application.
+    java
     application
+    kotlin("jvm")
+    kotlin("plugin.serialization") version kotlinVersion
+    id("org.openjfx.javafxplugin") version "0.0.9"
+    id("org.beryx.jlink") version "2.21.0"
 }
 
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
+    mavenCentral()
     jcenter()
 }
 
 dependencies {
-    // Align versions of all Kotlin components
-    implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
+//    runtimeOnly(project(":exalt"))
+//    runtimeOnly(project(":inject"))
+//    compileOnly(project(":proxy"))
 
-    // Use the Kotlin JDK 8 standard library.
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-    // Use the Kotlin test library.
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-
-    // Use the Kotlin JUnit integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
 
 application {
-    // Define the main class for the application.
-    mainClassName = "com.abysl.chaos.manager.AppKt"
+    mainModule.set("com.abysl.chaos.manager")
+    mainClassName = "com.abysl.chaos.manager.MainKt"
 }
+
+javafx {
+    version = "14"
+    modules = listOf("javafx.controls", "javafx.web", "javafx.fxml")
+}
+
+jlink {
+    options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
+
+    launcher {
+        name = "Chaos"
+    }
+
+    jpackage {
+        resourceDir = file("$buildDir/resources")
+        imageOptions = listOf("--icon", "src/main/resources/com/abysl/chaos/manager/images/chaos.ico")
+        installerOptions = listOf("--win-per-user-install", "--win-dir-chooser", "--win-menu")
+        appVersion = project.version.toString()
+    }
+}
+
+tasks.jpackageImage {
+    doLast {
+        copy {
+            from("bin/")
+            include("*.exe")
+            include("*.dll")
+            into("$buildDir/jpackage/Chaos")
+        }
+    }
+}
+
+
+tasks.classes {
+    dependsOn("createBin")
+}
+
+tasks.clean {
+    doFirst {
+        delete("bin/")
+    }
+}
+
+task("createBin") {
+    dependsOn(":inject:installRelease")
+    dependsOn(":exalt:linkRelease")
+    doLast {
+        copy {
+            from(project(":inject").buildDir.path + "/exe/main/release/inject.exe")
+            into("bin/")
+        }
+        copy {
+            from(project(":exalt").buildDir.path + "/lib/main/release/exalt.dll")
+            into("bin/")
+        }
+    }
+}
+
+
+
+

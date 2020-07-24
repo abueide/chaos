@@ -1,3 +1,15 @@
+plugins {
+	kotlin("jvm") version "1.3.72" apply false
+}
+
+repositories{
+	mavenCentral()
+}
+
+allprojects{
+	version = "1.0"
+    group = "com.abysl.chaos"
+}
 subprojects {
 	tasks.register("hello") {
 		doLast {
@@ -6,22 +18,5 @@ subprojects {
 	}
 }
 
-task("test") {
-    println("test")
-	subprojects.forEach {project ->
-        println(project.pluginManager.hasPlugin("cpp-flibrary"))
-	}
-}
-
-configure(
-		subprojects.filter {project ->
-            project.plugins.forEach { println(it) }
-			true
-		})
-{
-	tasks.named("hello"){
-		doLast {
-			println("- I'm a cpp project")
-		}
-	}
+configure(subprojects.filter {it.name == "manager" || it.name == "proxy"}) {
 }
