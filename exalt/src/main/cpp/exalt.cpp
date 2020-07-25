@@ -5,7 +5,6 @@
 #include "MinHook.h"
 #include <psapi.h>
 
-#pragma comment(lib, "psapi.lib")
 #define INRANGE(x,a,b)    (x >= a && x <= b)
 #define getBits( x )    (INRANGE((x&(~0x20)),'A','F') ? ((x&(~0x20)) - 'A' + 0xa) : (INRANGE(x,'0','9') ? x - '0' : 0))
 #define getByte( x )    (getBits(x[0]) << 4 | getBits(x[1]))
@@ -91,39 +90,6 @@ void* __fastcall m_pCacheEntityDetour(void* ECX, void* EDX)
     return ((void*(__thiscall*)(void*))(m_pCacheEntityOriginal))(ECX); //remember to call the games original function
 }
 
-INPUT m_pConstructKeyBoardInput(WORD m_wVirtualKey, DWORD m_dwFlags)
-{
-    INPUT m_inpInput;
-    m_inpInput.type = INPUT_KEYBOARD;
-    m_inpInput.ki.wVk = m_wVirtualKey;
-    m_inpInput.ki.dwFlags = m_dwFlags;
-    m_inpInput.ki.wScan = MapVirtualKeyExA(m_wVirtualKey, 0, GetKeyboardLayout(GetCurrentThreadId()));
-    m_inpInput.ki.time = 0;
-    m_inpInput.ki.dwExtraInfo = 0;
-
-    return m_inpInput;
-}
-
-void m_pForceKeyDown(DWORD m_dwKey)
-{
-    INPUT input = m_pConstructKeyBoardInput(m_dwKey, KEYEVENTF_SCANCODE);
-    SendInput(1, &input, sizeof(INPUT));
-}
-
-void m_pForceKeyUp(DWORD m_dwKey)
-{
-    INPUT input = m_pConstructKeyBoardInput(m_dwKey, KEYEVENTF_KEYUP);
-    SendInput(1, &input, sizeof(INPUT));
-}
-
-void m_pHoldKeyDown(DWORD m_dwKey, DWORD m_dwTimeMs = 1)
-{
-    m_pForceKeyDown(m_dwKey);
-    Sleep(m_dwTimeMs);
-    m_pForceKeyUp(m_dwKey);
-}
-
-
 int m_nAutonexusValue = 20; //0 - 100
 //set default autonexus value to 20
 char m_strNexusKey = 'R'; //set the nexus key
@@ -157,7 +123,7 @@ void m_pCheckHealthThread()
 
             if (m_nHealthPercentage < m_nAutonexusValue) //we have less health % than the minimum allowed, nexus
             {
-                m_pHoldKeyDown(m_strNexusKey, 20);
+                printf("MANUAL AUTONEXUS ALERT");
             }
         }
         Sleep(5); //check every 5 ms, any less will probably put too much of a strain on cpu for something so simple

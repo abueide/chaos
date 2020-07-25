@@ -5,10 +5,3 @@ plugins {
 group = 'com.abysl.chaos'
 version = '1.0'
 
-library {
-        if (!it.libs.contains(vulkanLibPath)) {
-            it.libs.from(vulkanLibPath)
-        }
-    }
-}
-
