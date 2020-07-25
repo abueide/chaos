@@ -50,7 +50,7 @@ class MainController : Initializable {
     private var exaltDir: SimpleObjectProperty<File> =
         SimpleObjectProperty(File(System.getProperty("user.home") + "/Documents/RealmOfTheMadGod/Production"))
     private val exaltExe: String = "RotMG Exalt.exe"
-    private val exaltDll = File("bin/exalt.dll")
+    private val exaltDll = File("bin/chaoshook.dll")
     private val injectExe = File("bin/inject.exe")
     private val settingsFile = File("settings.json")
 

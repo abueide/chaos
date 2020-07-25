@@ -1,0 +1,7 @@
+plugins {
+    id 'c'
+    id 'cpp-library'
+}
+
+group = 'com.abysl.chaos'
+

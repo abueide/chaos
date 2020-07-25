@@ -75,7 +75,7 @@ tasks.clean {
 
 task("createBin") {
     dependsOn(":inject:installRelease")
-    dependsOn(":exalt:linkRelease")
+//    dependsOn(":exalt:linkRelease")
     doLast {
         copy {
             from(project(":inject").buildDir.path + "/exe/main/release/inject.exe")
@@ -83,6 +83,10 @@ task("createBin") {
         }
         copy {
             from(project(":exalt").buildDir.path + "/lib/main/release/exalt.dll")
+            into("bin/")
+        }
+        copy {
+            from("C:\\Users\\Andrew\\programming\\rotmg\\chaoshook\\chaoshook\\x64\\Release\\chaoshook.dll")
             into("bin/")
         }
     }

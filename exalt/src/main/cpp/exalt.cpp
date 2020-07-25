@@ -1,9 +1,10 @@
-#include <Windows.h>
+#include "windows.h"
 #include "offsets.h"
 #include <cstdio>
 #include <iostream>
-#include "minhook/MinHook.h"
+#include "MinHook.h"
 #include <psapi.h>
+
 #pragma comment(lib, "psapi.lib")
 #define INRANGE(x,a,b)    (x >= a && x <= b)
 #define getBits( x )    (INRANGE((x&(~0x20)),'A','F') ? ((x&(~0x20)) - 'A' + 0xa) : (INRANGE(x,'0','9') ? x - '0' : 0))
@@ -127,8 +128,6 @@ int m_nAutonexusValue = 20; //0 - 100
 //set default autonexus value to 20
 char m_strNexusKey = 'R'; //set the nexus key
 
-
-
 void m_pCheckHealthThread()
 {
     MH_Initialize();
@@ -161,9 +160,8 @@ void m_pCheckHealthThread()
                 m_pHoldKeyDown(m_strNexusKey, 20);
             }
         }
-
         Sleep(5); //check every 5 ms, any less will probably put too much of a strain on cpu for something so simple
-    }
+        }
 }
 
 
