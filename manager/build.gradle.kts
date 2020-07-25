@@ -57,7 +57,7 @@ tasks.jpackageImage {
             from("bin/")
             include("*.exe")
             include("*.dll")
-            into("$buildDir/jpackage/Chaos")
+            into("$buildDir/jpackage/Chaos/bin/")
         }
     }
 }
@@ -75,7 +75,7 @@ tasks.clean {
 
 task("createBin") {
     dependsOn(":inject:installRelease")
-//    dependsOn(":exalt:linkRelease")
+    dependsOn(":exalt:linkRelease")
     doLast {
         copy {
             from(project(":inject").buildDir.path + "/exe/main/release/inject.exe")

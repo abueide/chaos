@@ -50,7 +50,7 @@ class MainController : Initializable {
     private var exaltDir: SimpleObjectProperty<File> =
         SimpleObjectProperty(File(System.getProperty("user.home") + "/Documents/RealmOfTheMadGod/Production"))
     private val exaltExe: String = "RotMG Exalt.exe"
-    private val exaltDll = File("bin/chaoshook.dll")
+    private val exaltDll = File("bin/exalt.dll")
     private val injectExe = File("bin/inject.exe")
     private val settingsFile = File("settings.json")
 
@@ -81,6 +81,9 @@ class MainController : Initializable {
 
     fun exit() {
         saveSettings()
+        processes.values.forEach{
+            it.destroy()
+        }
     }
 
     private fun loadSettings() {
@@ -185,6 +188,7 @@ class MainController : Initializable {
                 val execCommand =
                             "\"${exaltPath.text}/$exaltExe\"" +
                             " data:{platform:Deca,password:${account.getBase64Password()},guid:${account.getBase64Email()},env:4}"
+                println(execCommand)
                 val process: Process = Runtime.getRuntime().exec(execCommand)
                 processes[account] = process
 
