@@ -25,34 +25,13 @@ class Proxy {
 
             while (true) {
                 val socket = server.accept()
+                println("Socket accepted: ${socket.remoteAddress}")
+                val client_input: ByteReadChannel = socket.openReadChannel()
+                val client_output: ByteWriteChannel = socket.openWriteChannel(autoFlush = true)
+                val user = User(client_input, client_output)
+                users.add(user)
                 launch {
-                    println("Socket accepted: ${socket.remoteAddress}")
-                    val client_input: ByteReadChannel = socket.openReadChannel()
-                    val client_output: ByteWriteChannel = socket.openWriteChannel(autoFlush = true)
-                    while(true){
-                        println("hello")
-                        val line = client_input.readUTF8Line()
-//                        val server_input_buffer = server_input.toByteArray()
-
-//                        if (client_input_buffer.isNotEmpty()) {
-//                            println("test")
-//                            for (b: Byte in client_input_buffer) {
-//                                println("New client packet: ")
-//                                print("$b, ")
-//                                print("\n")
-//                            }
-//                            client_output.writeFully(client_input_buffer)
-//                        }
-
-//                        if (server_input_buffer.isNotEmpty()) {
-//                            for (b: Byte in server_input_buffer) {
-//                                println("New server packet: ")
-//                                print("$b, ")
-//                                print("\n")
-//                            }
-//                            client_output.writeFully(server_input_buffer)
-//                        }
-                    }
+                    user.start()
                 }
             }
         }

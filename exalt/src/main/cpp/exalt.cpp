@@ -117,12 +117,15 @@ ILSTR localhost = ILSTR(L"127.0.0.1");
 typedef uintptr_t*(__thiscall * Connect)(void*, ILSTR*, int, ILSTR*, ILSTR*);
 
 void *__stdcall connectDetour(void* socketmanager, ILSTR* ip, int port, ILSTR* incomingCipher, ILSTR* outgoingCipher){
-    wprintf(L"%ls\n", ip->m_pGetString());
     _socketmanager = socketmanager;
     _ip = ip;
     _in = incomingCipher;
     _out = outgoingCipher;
     foundConnect = true;
+
+    wprintf(L"%ls\n", _ip->m_pGetString());
+    wprintf(L"%ls\n", _in->m_pGetString());
+    wprintf(L"%ls\n", _out->m_pGetString());
     return ((Connect)(connectOriginal))(socketmanager, &localhost, port, incomingCipher, outgoingCipher);
 }
 

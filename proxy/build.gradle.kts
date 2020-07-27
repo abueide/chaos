@@ -20,6 +20,8 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.66")
+
 }
 
 application {
