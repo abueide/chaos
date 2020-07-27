@@ -1,7 +1,6 @@
 package com.abysl.chaos.manager.controllers
 
 import com.abysl.chaos.manager.data.Account
-import com.abysl.chaos.manager.Main
 import com.abysl.chaos.manager.data.Settings
 import com.abysl.chaos.manager.windows.AccountEdit
 import javafx.beans.property.SimpleObjectProperty

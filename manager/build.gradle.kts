@@ -28,7 +28,7 @@ dependencies {
 
 application {
     mainModule.set("com.abysl.chaos.manager")
-    mainClassName = "com.abysl.chaos.manager.MainKt"
+    mainClassName = "com.abysl.chaos.manager.ManagerKt"
 }
 
 javafx {

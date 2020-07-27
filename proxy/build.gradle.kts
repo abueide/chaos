@@ -22,14 +22,19 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
 
 application {
     mainModule.set("com.abysl.chaos.proxy")
-    mainClassName = "com.abysl.chaos.proxy.AppKt"
+    mainClassName = "com.abysl.chaos.proxy.ProxyKt"
 }
+
+
+
 
 javafx {
     version = "14"

@@ -7,10 +7,9 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
-import java.io.File
 
 
-class Main: Application() {
+class Manager: Application() {
     override fun start(stage: Stage) {
         val loader = FXMLLoader(javaClass.getResource("fxml/main.fxml"));
         val root: Parent = loader.load()
@@ -30,7 +29,7 @@ class Main: Application() {
 }
 
 fun main(){
-    Application.launch(Main::class.java)
+    Application.launch(Manager::class.java)
 }
 
 

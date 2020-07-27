@@ -1,7 +1,7 @@
 package com.abysl.chaos.manager.windows
 
 import com.abysl.chaos.manager.data.Account
-import com.abysl.chaos.manager.Main
+import com.abysl.chaos.manager.Manager
 import com.abysl.chaos.manager.controllers.AccountEditController
 import javafx.collections.ObservableList
 import javafx.fxml.FXMLLoader
@@ -25,7 +25,7 @@ class AccountEdit(val account: Account, val accountList: ObservableList<Account>
     fun show(): Unit {
         try {
             //Load second scene
-            val loader = FXMLLoader(Main::class.java.getResource("fxml/account.fxml"))
+            val loader = FXMLLoader(Manager::class.java.getResource("fxml/account.fxml"))
             val root = loader.load<Parent>()
 
             //Get controller of scene2

@@ -1,6 +1,6 @@
 package com.abysl.chaos.manager.util
 
-import com.abysl.chaos.manager.Main
+import com.abysl.chaos.manager.Manager
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -15,14 +15,14 @@ object ResourceUtil {
         val jarFolder: String
         try {
             stream =
-                Main::class.java.getResourceAsStream(resourceName) //note that each / is a directory down in the "jar tree" been the jar the root of the tree
+                Manager::class.java.getResourceAsStream(resourceName) //note that each / is a directory down in the "jar tree" been the jar the root of the tree
             if (stream == null) {
                 throw Exception("Cannot get resource \"$resourceName\" from Jar file.")
             }
             var readBytes: Int
             val buffer = ByteArray(4096)
             jarFolder = File(
-                Main::class.java.protectionDomain.codeSource.location.toURI().path + "\\"
+                Manager::class.java.protectionDomain.codeSource.location.toURI().path + "\\"
             ).parentFile.path.replace('\\', '/')
             println(jarFolder + resourceName)
             resStreamOut = FileOutputStream(jarFolder + resourceName)
