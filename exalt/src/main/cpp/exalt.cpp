@@ -357,7 +357,7 @@ int m_nAutonexusValue = 80; //0 - 100
                     uintptr_t correctAddress = reinterpret_cast<uintptr_t>(GetModuleHandle("GameAssembly.dll")) + 0x183B400;
                     Connect connect = (Connect) correctAddress;
                     connect(_socketmanager, _ip, port, _in, _out);
-                uintptr_t nexusAddress = reinterpret_cast<uintptr_t>(GetModuleHandle("GameAssembly.dll")) + 0x12CA590;
+                    printf("Nexusing!\n");
             }
         }
         Sleep(20);
