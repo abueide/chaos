@@ -8,8 +8,6 @@ plugins {
     java
     application
     kotlin("jvm")
-    kotlin("plugin.serialization") version kotlinVersion
-    id("org.openjfx.javafxplugin") version "0.0.9"
     id("org.beryx.jlink") version "2.21.0"
 }
 
@@ -19,13 +17,9 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
+    implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
 
 application {
@@ -33,13 +27,10 @@ application {
     mainClassName = "com.abysl.chaos.proxy.ProxyKt"
 }
 
-
-
-
-javafx {
-    version = "14"
-    modules = listOf("javafx.controls", "javafx.web", "javafx.fxml")
-}
+//javafx {
+//    version = "14"
+//    modules = listOf("javafx.controls", "javafx.web", "javafx.fxml")
+//}
 
 jlink {
     options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
