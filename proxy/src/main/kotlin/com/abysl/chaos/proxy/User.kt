@@ -1,5 +1,9 @@
 package com.abysl.chaos.proxy
 
+import com.abysl.chaos.proxy.packets.Packet
+import com.abysl.chaos.proxy.packets.PacketFactory
+import com.abysl.chaos.proxy.plugins.data.PluginManager
+import com.abysl.chaos.proxy.plugins.data.TrafficPlugin
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
@@ -7,23 +11,29 @@ import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
 import java.net.InetSocketAddress
 
-class User(val client_input: ByteReadChannel, val client_output: ByteWriteChannel) {
+class User(val client: Client) {
     companion object {
-        val inCipher = Cipher("c79332b197f92ba85ed281a023")
-        val outCipher = Cipher("6a39570cc9de4ec71d64821894")
+        val clientInCipher = Cipher("6a39570cc9de4ec71d64821894")
+        val clientOutCipher = Cipher("c79332b197f92ba85ed281a023")
+        val serverInCipher = Cipher("c79332b197f92ba85ed281a023")
+        val serverOutCipher = Cipher("6a39570cc9de4ec71d64821894")
     }
 
-    lateinit var serverSocket: Socket
-    lateinit var server_input: ByteReadChannel
-    lateinit var server_output: ByteWriteChannel
+    lateinit var server: Server
+
+    val pluginManager = PluginManager(TrafficPlugin())
 
     fun start() {
         runBlocking {
             serverConnected()
         }
+
         GlobalScope.launch {
             while (true) {
-                if(client_input.availableForRead > 0) {
+                if (!client.isConnected()) {
+                    break
+                }
+                if (client.input.availableForRead > 0) {
                     processClient()
                 }
             }
@@ -31,7 +41,10 @@ class User(val client_input: ByteReadChannel, val client_output: ByteWriteChanne
 
         GlobalScope.launch {
             while (true) {
-                if (serverConnected() && server_input.availableForRead > 0) {
+                if (!client.isConnected()) {
+                    break
+                }
+                if (serverConnected() && server.input.availableForRead > 0) {
                     processServer()
                 }
             }
@@ -39,45 +52,67 @@ class User(val client_input: ByteReadChannel, val client_output: ByteWriteChanne
     }
 
     suspend fun processClient() {
-        val packetSize = client_input.readInt()
-        val packetId: Byte =client_input.readByte()
-        println("Client sent packet with id $packetId and length $packetSize")
-        val packet = client_input.readPacket(packetSize - 5)
-        readPacket(packet, packetSize - 5, outCipher)
+        pluginManager.triggerClient(readPacket(client.input, clientInCipher))
 
-        if (serverConnected()) {
-            server_output.writeInt(packetSize)
-            server_output.writeByte(packetId)
-            server_output.writePacket(packet)
+        while (pluginManager.clientToServer.isNotEmpty()){
+            sendPacket(pluginManager.clientToServer.poll(), server.output, serverOutCipher)
         }
     }
 
     suspend fun processServer() {
-        val packetSize: Int = server_input.readInt()
-        val packetId: Byte = server_input.readByte()
-        println("Server sent packet with id $packetId and length $packetSize")
-        val packet: ByteReadPacket = server_input.readPacket(packetSize - 5)
+        pluginManager.triggerServer(readPacket(server.input, serverInCipher))
 
-        readPacket(packet, packetSize - 5, inCipher)
-
-        client_output.writeInt(packetSize)
-        client_output.writeByte(packetId)
-        client_output.writePacket(packet)
+        while (pluginManager.serverToClient.isNotEmpty()){
+            sendPacket(pluginManager.serverToClient.poll(), client.output, clientOutCipher)
+        }
     }
 
     private suspend fun serverConnected(): Boolean {
-        if (!this::serverSocket.isInitialized || serverSocket.isClosed) {
-            serverSocket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("184.169.251.52", 2050))
-            server_input = serverSocket.openReadChannel()
-            server_output = serverSocket.openWriteChannel(autoFlush = true)
+        if (!this::server.isInitialized || !server.isConnected()) {
+            val socket = aSocket(ActorSelectorManager(Dispatchers.IO)).tcp().connect(InetSocketAddress("184.169.251.52", 2050))
+            server = Server(socket)
         }
-        return !serverSocket.isClosed
+        return server.isConnected()
     }
 
-    private fun readPacket(packet: ByteReadPacket, size: Int, cipher: Cipher) {
-        val copy = packet.copy()
-        var bytes = copy.readBytes(size)
-        cipher.cipher(bytes)
-        println(String(bytes))
+    private fun cipher(packet: ByteReadPacket, cipher: Cipher): ByteArray {
+        val byteArray: ByteArray = packet.readBytes(packet.remaining.toInt())
+        cipher.cipher(byteArray)
+        return byteArray
+    }
+
+    private suspend fun readPacket(input: ByteReadChannel, cipher: Cipher): Packet {
+        val packetSize = input.readInt()
+        val packetId: Byte = input.readByte()
+        val packet = input.readPacket(packetSize - 5)
+        val decryptedPacket = cipher(packet, cipher)
+        return PacketFactory.createPacket(packetId.toInt(), decryptedPacket)
+    }
+
+    private suspend fun sendPacket(packet: Packet, output: ByteWriteChannel, cipher: Cipher){
+        val packetData = cipher(packet.toByteReadPacket(), cipher)
+        output.writeInt(packetData.size + 5)
+        output.writeByte(packet.id.toByte())
+        output.writePacket(ByteReadPacket(packetData))
+    }
+
+    private suspend fun testClientPacket(packet: ByteReadChannel){
+
+        val packetSize: Int = packet.readInt();
+        val packetId: Byte = packet.readByte()
+        val data: ByteArray = packet.readPacket(packetSize - 5).readBytes(packetSize - 5)
+        val backup: ByteArray = data.copyOf()
+        println()
+        clientInCipher.cipher(data)
+        for(b in data){
+            print("$b, ")
+        }
+        print("\n")
+        serverOutCipher.cipher(data)
+        for(i in data.indices){
+            print("${data[i]}:${backup[i]}, ")
+        }
+        print("\n")
+
     }
 }

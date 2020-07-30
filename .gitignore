@@ -3,3 +3,4 @@
 build/
 bin/
 *.json
+proxy/data/

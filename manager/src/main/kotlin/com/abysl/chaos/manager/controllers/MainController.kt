@@ -91,6 +91,7 @@ class MainController : Initializable {
                 .parse(Settings.serializer(), String(settingsFile.readBytes()))
             setSettings(parseSettings)
         }
+        accountList.items.forEach { println(it.getBase64Email()) }
     }
 
     private fun setSettings(settings: Settings) {

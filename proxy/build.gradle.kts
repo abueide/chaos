@@ -4,6 +4,10 @@
  * This generated file contains a sample Kotlin application project to get you started.
  */
 
+import java.io.StringReader
+import kotlin.text.StringBuilder
+import org.w3c.dom.*
+
 plugins {
     java
     application
@@ -48,3 +52,9 @@ jlink {
         appVersion = project.version.toString()
     }
 }
+
+task("transpile", JavaExec::class) {
+    main = "com.abysl.chaos.proxy.tools.TranspilerKt"
+    classpath = sourceSets["main"].runtimeClasspath
+}
+

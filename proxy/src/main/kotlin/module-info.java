@@ -5,5 +5,7 @@ module com.abysl.chaos.proxy {
     requires kotlinx.coroutines.core;
     requires ktor.network;
     requires org.bouncycastle.provider;
+    requires java.xml;
+    requires kotlin.reflect;
     exports com.abysl.chaos.proxy;
 }

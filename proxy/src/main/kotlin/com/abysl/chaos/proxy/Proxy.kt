@@ -1,5 +1,7 @@
 package com.abysl.chaos.proxy
 
+import com.abysl.chaos.proxy.packets.HelloPacket
+import com.abysl.chaos.proxy.packets.Packet
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.network.selector.*
@@ -26,9 +28,7 @@ class Proxy {
             while (true) {
                 val socket = server.accept()
                 println("Socket accepted: ${socket.remoteAddress}")
-                val client_input: ByteReadChannel = socket.openReadChannel()
-                val client_output: ByteWriteChannel = socket.openWriteChannel(autoFlush = true)
-                val user = User(client_input, client_output)
+                val user = User(Client(socket))
                 users.add(user)
                 launch {
                     user.start()
