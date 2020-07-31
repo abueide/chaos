@@ -1,5 +1,6 @@
 package com.abysl.chaos.proxy.packets
 
+import com.abysl.chaos.proxy.packets.transpiled.Hello
 import io.ktor.utils.io.core.*
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -13,7 +14,7 @@ object PacketFactory {
 
     fun createPacket(id: Int, data: ByteArray): Packet{
         if(id == Packets.HELLO.id){
-            return HelloPacket(data)
+            return Hello(data)
         }
         return UnknownPacket(id, data)
     }

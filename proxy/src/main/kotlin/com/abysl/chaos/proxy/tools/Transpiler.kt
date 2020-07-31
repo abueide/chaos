@@ -11,13 +11,17 @@ class Transpiler {
     }
 
     fun readToken(line: String): Token {
-        var temp: String = line.split("var")[1].removeSuffix(";")
-        var tempsplit = temp.split(":").toTypedArray()
-        if (tempsplit.size != 2) {
+        var temp: String = line.split("var")[1].removeSuffix(";").split("=")[0]
+        var token = temp.split(":").toTypedArray()
+        if (token.size != 2) {
             return Token("parsing failure", "parsing failure")
         }
-        var type = tempsplit[1].substring(0, 1).toUpperCase() + tempsplit[1].substring(1)
-        return Token(tempsplit[0], type)
+        if(token[1].startsWith("u")){
+            token[1] = token[1].substring(0, 2).toUpperCase() + token[1].substring(2)
+        }else {
+            token[1] = token[1].substring(0, 1).toUpperCase() + token[1].substring(1)
+        }
+        return Token(token[0].trim(), token[1].trim())
     }
 
     fun readClass(lines: Array<String>): ClassData {
@@ -41,6 +45,7 @@ class Transpiler {
             when (token.type) {
                 "ByteArray" -> return "${token.name} = packet.readBytes(packet.readShort().toInt())"
                 "Short" -> return "${token.name} = packet.readShort()"
+                "UInt" -> return "${token.name} = packet.readUInt()"
                 "Int" -> return "${token.name} = packet.readInt()"
                 "String" -> return "${token.name} = readUTF8String(packet)"
                 else -> return "Unimplemented Type: ${token.type}"
@@ -51,6 +56,7 @@ class Transpiler {
             when (token.type) {
                 "ByteArray" -> return "packet.writePacket(ByteReadPacket(${token.name}))"
                 "Short" -> return "packet.writeShort(${token.name})"
+                "UInt" -> return "packet.writeUInt(${token.name})"
                 "Int" -> return "packet.writeInt(${token.name})"
                 "String" -> return "writeUTF8String(packet, ${token.name})"
                 else -> return "Unimplemented Type: ${token.type}"
@@ -60,6 +66,8 @@ class Transpiler {
 
     data class ClassData(val name: String, val superType: String, val members: Array<Token>) {
         val imports = """
+        import com.abysl.chaos.proxy.packets.Packet
+        import com.abysl.chaos.proxy.packets.Packets
         import com.abysl.chaos.proxy.util.PacketUtil.readUTF8String
         import com.abysl.chaos.proxy.util.PacketUtil.writeUTF8String
         import io.ktor.utils.io.core.*
@@ -87,21 +95,21 @@ class Transpiler {
             builder.appendln(imports)
             builder.appendln(body)
             for (token in members) {
-                if(token.type.contains("Int")){
-                    builder.appendln("var  ${token.name} by Delegates.notNull<Int>()")
+                if (token.type.contains("Int")) {
+                    builder.append("var  ${token.name} by Delegates.notNull<Int>()\n")
                 } else {
-                    builder.appendln("lateinit var ${token.name}: ${token.type}")
+                    builder.append("lateinit var ${token.name}: ${token.type}\n")
                 }
             }
             builder.appendln(initFunction)
             builder.appendln(readFunction)
             for (token in members) {
-                builder.appendln(token.toRead(token))
+                builder.append(token.toRead(token) + "\n")
             }
             builder.appendln("}")
             builder.appendln(writeFunction)
             for (token in members) {
-                builder.appendln(token.toWrite(token))
+                builder.append(token.toWrite(token) + "\n")
             }
             builder.appendln("return packet.build()")
             builder.appendln("}")

@@ -1,6 +1,5 @@
 package com.abysl.chaos.proxy
 
-import com.abysl.chaos.proxy.packets.HelloPacket
 import com.abysl.chaos.proxy.packets.Packet
 import io.ktor.application.*
 import io.ktor.http.*
